@@ -71,7 +71,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <time.h>
 
+/* 2D image arrarys used for drawing by pixels*/
 const int starting_screen[240][320] = {
     {59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 59228, 59228, 59228, 59228, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228},
     {59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 59228, 59228, 59228, 59228, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228, 59228},
@@ -1048,17 +1051,31 @@ const int red_victory[240][320] = {
 
 };
 
+const int splash_bomb[10][10] = {
+    {-1, -1, -1, 0, 0, 0, 0, -1, -1, -1},
+    {-1, -1, 0, 43398, 43398, 43398, 43398, 0, -1, -1},
+    {-1, 0, 43398, 43398, 43398, 43398, 43398, 43398, 0, -1},
+    {0, 43398, 43398, 43398, 43398, 43398, 43398, 26236, 26236, 0},
+    {0, 43398, 43398, 43398, 43398, 43398, 26236, 26236, 26236, 0},
+    {0, 43398, 43398, 43398, 43398, 26236, 26236, 26236, 26236, 0},
+    {0, 43398, 43398, 43398, 26236, 26236, 26236, 26236, 26236, 0},
+    {-1, 0, 43398, 26236, 26236, 26236, 26236, 26236, 0, -1},
+    {-1, -1, 0, 26236, 26236, 26236, 26236, 0, -1, -1},
+    {-1, -1, -1, 0, 0, 0, 0, -1, -1, -1},
+
+};
+
 const int blue_player[10][10] = {
     {19734, 19734, 19734, 19734, 19734, 19734, 19734, 19734, 19734, 19734},
     {19734, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 19734},
     {19734, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 19734},
-    {19734, 26236, 19734, 19734, 26236, 26236, 19734, 19734, 26236, 19734},
+    {19734, 26236, 0, 65535, 26236, 26236, 0, 65535, 26236, 19734},
+    {19734, 26236, 0, 0, 26236, 26236, 0, 0, 26236, 19734},
+    {19734, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 19734},
+    {19734, 26236, 0, 0, 0, 0, 0, 0, 26236, 19734},
     {19734, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 19734},
     {19734, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 26236, 19734},
-    {23993, 23993, 26236, 19734, 19734, 19734, 19734, 26236, 23993, 23993},
-    {19734, 23993, 26236, 26236, 26236, 26236, 26236, 26236, 23993, 19734},
-    {13167, 19734, 23993, 23993, 23993, 23993, 23993, 23993, 19734, 13167},
-    {13167, 13167, 19734, 19734, 23993, 23993, 19734, 19734, 13167, 13167},
+    {19734, 19734, 19734, 19734, 19734, 19734, 19734, 19734, 19734, 19734},
 
 };
 
@@ -1080,13 +1097,13 @@ const int red_player[10][10] = {
     {33060, 33060, 33060, 33060, 33060, 33060, 33060, 33060, 33060, 33060},
     {33060, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 33060},
     {33060, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 33060},
-    {33060, 43398, 33060, 33060, 43398, 43398, 33060, 33060, 43398, 33060},
-    {33060, 43398, 33060, 33060, 43398, 43398, 33060, 33060, 43398, 33060},
+    {33060, 43398, 65535, 0, 43398, 43398, 65535, 0, 43398, 33060},
+    {33060, 43398, 0, 0, 43398, 43398, 0, 0, 43398, 33060},
     {33060, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 33060},
-    {39464, 39464, 43398, 43398, 33060, 33060, 43398, 43398, 39464, 39464},
-    {35271, 39464, 43398, 43398, 43398, 43398, 43398, 43398, 39464, 35271},
-    {26851, 35271, 39464, 39464, 39464, 39464, 39464, 39464, 35271, 26851},
-    {26851, 26851, 35271, 35271, 39464, 39464, 35271, 35271, 26851, 26851},
+    {33060, 43398, 0, 0, 0, 0, 0, 0, 43398, 33060},
+    {33060, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 33060},
+    {33060, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 43398, 33060},
+    {33060, 33060, 33060, 33060, 33060, 33060, 33060, 33060, 33060, 33060},
 
 };
 
@@ -1104,7 +1121,7 @@ const int red_residue[10][10] = {
 
 };
 
-// function declarations
+/* Function declarations */
 void get_PS2_input();
 void make_move();
 void draw_start();
@@ -1117,7 +1134,7 @@ void clear_screen();
 void plot_pixel(int x, int y, short int line_color);
 void wait_for_vsync(volatile int *pixel_ctrl_ptr);
 
-// global variables
+/* Global variables */
 volatile int pixel_buffer_start;
 int byte1, byte2, byte3;
 int p1_curX = MIN_X;
@@ -1133,22 +1150,23 @@ int p2_score;
 char p1_score_string[3];
 char p2_score_string[3];
 int winner;
+int splash_count = 0;
 
-// global struct
+/* Global struct */
 struct board
 {
     int x;
     int y;
     int colour;
+    bool splash;
 };
-
 struct board game_board[22][22];
 
 int main(void)
 {
     volatile int *pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
 
-    // initialize and set buffer
+    // initialize screen and set buffer
     *(pixel_ctrl_ptr + 1) = 0xC8000000;
     wait_for_vsync(pixel_ctrl_ptr);
     pixel_buffer_start = *pixel_ctrl_ptr;
@@ -1164,7 +1182,7 @@ int main(void)
     draw_text(63, 30, "                    ");
     draw_text(63, 35, "                    ");
 
-    // initial game board set up
+    // initial game board set-up
     int i, j;
     for (i = 0; i < 22; i++)
     {
@@ -1173,10 +1191,14 @@ int main(void)
             game_board[i][j].x = MIN_X + j * 10;
             game_board[i][j].y = MIN_Y + i * 10;
             game_board[i][j].colour = 0;
+            game_board[i][j].splash = false;
         }
     }
 
-    // loop until game starts
+    // random number generator set-up
+    srand(time(NULL));
+
+    // loop until enter is pressed to start the game
     while (1)
     {
         get_PS2_input();
@@ -1186,6 +1208,7 @@ int main(void)
         }
     }
 
+    // draw initial in-game visuals
     draw_game_board();
     draw_tile(MIN_X, MIN_Y, blue_player);
     draw_tile(MAX_X, MAX_Y, red_player);
@@ -1195,7 +1218,7 @@ int main(void)
     draw_tile(MIN_X, MIN_Y, blue_player);
     draw_tile(MAX_X, MAX_Y, red_player);
 
-    // creates buffer time and show ready messages
+    // create transition and show ready messages
     int count;
     for (count = 1500000; count >= 0; count--)
     {
@@ -1226,19 +1249,30 @@ int main(void)
         }
         else if (count == 0)
         {
-            // clears ready messages
+            // clear ready messages
             draw_text(65, 30, "            ");
             wait_for_vsync(pixel_ctrl_ptr);
             pixel_buffer_start = *(pixel_ctrl_ptr + 1);
             draw_text(65, 30, "            ");
         }
     }
+
+    // main game logic
     while (1)
     {
-        // check player movements
+        // check player movements and update game board state
         make_move();
 
-        // draw all residue on game board
+        // generate splash bombs in the game
+        if (splash_count < 2 && (p1_score >= 100 || p2_score >= 100))
+        {
+            int x_loc = rand() % 22;
+            int y_loc = rand() % 22;
+            game_board[y_loc][x_loc].splash = true;
+            splash_count++;
+        }
+
+        // draw all residues and current splash bombs on the game board
         int i, j;
         for (i = 0; i < 22; i++)
         {
@@ -1251,6 +1285,10 @@ int main(void)
                 else if (game_board[j][i].colour == 2)
                 {
                     draw_tile(game_board[j][i].x, game_board[j][i].y, red_residue);
+                }
+                if (game_board[j][i].splash)
+                {
+                    draw_tile(game_board[j][i].x, game_board[j][i].y, splash_bomb);
                 }
             }
         }
@@ -1275,34 +1313,6 @@ int main(void)
         wait_for_vsync(pixel_ctrl_ptr);
         pixel_buffer_start = *(pixel_ctrl_ptr + 1);
 
-        // repeat for next frame
-        for (i = 0; i < 22; i++)
-        {
-            for (j = 0; j < 22; j++)
-            {
-                if (game_board[j][i].colour == 1)
-                {
-                    draw_tile(game_board[j][i].x, game_board[j][i].y, blue_residue);
-                }
-                else if (game_board[j][i].colour == 2)
-                {
-                    draw_tile(game_board[j][i].x, game_board[j][i].y, red_residue);
-                }
-            }
-        }
-        draw_text(63, 25, "                    ");
-        draw_text(63, 30, "                    ");
-        draw_text(63, 35, "                    ");
-        draw_tile(p1_curX, p1_curY, blue_player);
-        draw_tile(p2_curX, p2_curY, red_player);
-        draw_text(65, 25, "Scores");
-        draw_text(65, 30, "Blue:");
-        itoa(p1_score, p1_score_string, 10);
-        draw_text(71, 30, p1_score_string);
-        draw_text(65, 35, "Red:");
-        itoa(p2_score, p2_score_string, 10);
-        draw_text(71, 35, p2_score_string);
-
         // check for win condition
         if (p1_score >= 250)
         {
@@ -1316,7 +1326,7 @@ int main(void)
         }
     }
 
-    // end game
+    // end game, draw winner information
     draw_text(63, 25, "                    ");
     draw_text(63, 30, "                    ");
     draw_text(63, 35, "                    ");
@@ -1345,7 +1355,7 @@ int main(void)
     }
 }
 
-/* Control functions */
+/* Control function */
 // Obtain key press information
 void get_PS2_input()
 {
@@ -1368,8 +1378,9 @@ void get_PS2_input()
     }
 }
 
-/* Game logic functions */
-// directional logic for the players
+/* Game logic function */
+// directional logic for the players and update the
+// game board and scores after player movements
 void make_move()
 {
     get_PS2_input();
@@ -1459,9 +1470,44 @@ void make_move()
         p2_dy = 0;
     }
 
-    // logic for the residue that the players leave behind
+    // create new residue that the players leave behind
     game_board[struct_y1][struct_x1].colour = 1;
     game_board[struct_y2][struct_x2].colour = 2;
+
+    // logic for splash bombs, passing through one creates a
+    // 9 by 9 residue splash of the respective player's colour
+    if (game_board[struct_y1][struct_x1].colour == 1 && game_board[struct_y1][struct_x1].splash)
+    {
+        int i, j;
+        for (i = -4; i <= 4; i++)
+        {
+            for (j = -4; j <= 4; j++)
+            {
+                if ((struct_y1 + i) >= 0 && (struct_y1 + i) <= 21 && (struct_x1 + j) >= 0 && (struct_x1 + j) <= 21)
+                {
+                    game_board[struct_y1 + i][struct_x1 + j].colour = 1;
+                }
+            }
+        }
+        game_board[struct_y1][struct_x1].splash = false;
+        splash_count--;
+    }
+    if (game_board[struct_y2][struct_x2].colour == 2 && game_board[struct_y2][struct_x2].splash)
+    {
+        int i, j;
+        for (i = -4; i <= 4; i++)
+        {
+            for (j = -4; j <= 4; j++)
+            {
+                if ((struct_y2 + i) >= 0 && (struct_y2 + i) <= 21 && (struct_x2 + j) >= 0 && (struct_x2 + j) <= 21)
+                {
+                    game_board[struct_y2 + i][struct_x2 + j].colour = 2;
+                }
+            }
+        }
+        game_board[struct_y2][struct_x2].splash = false;
+        splash_count--;
+    }
 
     // update player current locations
     p1_curX += p1_dx;
@@ -1469,7 +1515,8 @@ void make_move()
     p2_curX += p2_dx;
     p2_curY += p2_dy;
 
-    // check current game score
+    // check current game scores based on the amount of
+    // residues each player have left behind
     int i, j;
     p1_score = 0;
     p2_score = 0;
@@ -1490,7 +1537,7 @@ void make_move()
 }
 
 /*  Drawing functions */
-// drawing starting menu
+// draw starting menu
 void draw_start()
 {
     int x;
@@ -1504,7 +1551,7 @@ void draw_start()
     }
 }
 
-// drawing actual board/area of play
+// draw in-game board/area of play
 void draw_game_board()
 {
     int x;
@@ -1518,7 +1565,7 @@ void draw_game_board()
     }
 }
 
-// drawing end game screen for blue
+// draw end game screen for blue's victory
 void draw_end_blue()
 {
     int x;
@@ -1532,7 +1579,7 @@ void draw_end_blue()
     }
 }
 
-// drawing end game screen for red
+// draw end game screen for red's victory
 void draw_end_red()
 {
     int x;
@@ -1546,7 +1593,7 @@ void draw_end_red()
     }
 }
 
-// drawing players and colour residue
+// draw players and colour residue
 void draw_tile(int x, int y, const int image[10][10])
 {
     int i, j;
@@ -1554,12 +1601,16 @@ void draw_tile(int x, int y, const int image[10][10])
     {
         for (j = 0; j < 10; j++)
         {
-            plot_pixel(j + x, i + y, image[i][j]);
+            // draw all pixels that are not transparent (-1 in value)
+            if (image[i][j] != -1)
+            {
+                plot_pixel(j + x, i + y, image[i][j]);
+            }
         }
     }
 }
 
-// drawing text on screen
+// draw text on screen
 void draw_text(int x, int y, char *text_ptr)
 {
     int offset = (y << 7) + x;
