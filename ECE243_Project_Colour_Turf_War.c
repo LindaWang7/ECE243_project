@@ -1182,7 +1182,7 @@ int main(void)
     draw_text(63, 30, "                    ");
     draw_text(63, 35, "                    ");
 
-    // initial game board set-up
+    // initial gameboard set-up
     int i, j;
     for (i = 0; i < 22; i++)
     {
@@ -1260,7 +1260,7 @@ int main(void)
     // main game logic
     while (1)
     {
-        // check player movements and update game board state
+        // check player movements and update gameboard state
         make_move();
 
         // generate splash bombs in the game
@@ -1272,7 +1272,7 @@ int main(void)
             splash_count++;
         }
 
-        // draw all residues and current splash bombs on the game board
+        // draw all residues and current splash bombs on the gameboard
         int i, j;
         for (i = 0; i < 22; i++)
         {
@@ -1359,28 +1359,22 @@ int main(void)
 // Obtain key press information
 void get_PS2_input()
 {
-
     volatile int *PS2_ptr = (int *)PS2_BASE;
-
     int PS2_data, RVALID;
-
     PS2_data = *(PS2_ptr);
-    RVALID = (PS2_data & 0x8000);
-    if (RVALID != 0)
+    RVALID = PS2_data & 0x8000;
+    if (RVALID)
     {
+        /* save the last three bytes of data */
         byte1 = byte2;
         byte2 = byte3;
         byte3 = PS2_data & 0xFF;
-    }
-    if ((byte2 == 0xAA) && (byte3 == 0x00))
-    {
-        *(PS2_ptr) = 0xF4;
     }
 }
 
 /* Game logic function */
 // directional logic for the players and update the
-// game board and scores after player movements
+// gameboard and scores after new movements
 void make_move()
 {
     get_PS2_input();
@@ -1390,7 +1384,7 @@ void make_move()
     int struct_x2 = (p2_curX - MIN_X) / 10;
     int struct_y2 = (p2_curY - MIN_Y) / 10;
 
-    // delta movement logic for player 1
+    // delta movement logic for player 1, updated based on keyboard inputs
     if (byte3 == 0x1D && struct_y1 > 0)
     {
         p1_dy = -10;
@@ -1412,7 +1406,7 @@ void make_move()
         p1_dx = 0;
     }
 
-    // delta movement logic for player 2
+    // delta movement logic for player 2, updated based on keyboard inputs
     if (byte3 == 0x75 && struct_y2 > 0)
     {
         p2_dy = -10;
@@ -1483,6 +1477,7 @@ void make_move()
         {
             for (j = -4; j <= 4; j++)
             {
+                // check to prevent drawing residues outside of the gameboard
                 if ((struct_y1 + i) >= 0 && (struct_y1 + i) <= 21 && (struct_x1 + j) >= 0 && (struct_x1 + j) <= 21)
                 {
                     game_board[struct_y1 + i][struct_x1 + j].colour = 1;
@@ -1499,6 +1494,7 @@ void make_move()
         {
             for (j = -4; j <= 4; j++)
             {
+                // check to prevent drawing residues outside of the gameboard
                 if ((struct_y2 + i) >= 0 && (struct_y2 + i) <= 21 && (struct_x2 + j) >= 0 && (struct_x2 + j) <= 21)
                 {
                     game_board[struct_y2 + i][struct_x2 + j].colour = 2;
@@ -1593,7 +1589,7 @@ void draw_end_red()
     }
 }
 
-// draw players and colour residue
+// draw any 10 by 10 image
 void draw_tile(int x, int y, const int image[10][10])
 {
     int i, j;
@@ -1636,7 +1632,7 @@ void clear_screen()
     }
 }
 
-// store color value into pixel addresses
+// store colour value into pixel addresses
 void plot_pixel(int x, int y, short int line_color)
 {
     *(short int *)(pixel_buffer_start + (y << 10) + (x << 1)) = line_color;
