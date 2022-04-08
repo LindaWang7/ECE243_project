@@ -73,6 +73,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
+#include <math.h>
 
 /* 2D image arrarys used for drawing by pixels*/
 const int starting_screen[240][320] = {
@@ -1124,10 +1125,7 @@ const int red_residue[10][10] = {
 /* Function declarations */
 void get_PS2_input();
 void make_move();
-void draw_start();
-void draw_game_board();
-void draw_end_blue();
-void draw_end_red();
+void draw_fullscreen(const int image[240][320]);
 void draw_tile(int x, int y, const int image[10][10]);
 void draw_text(int x, int y, char *text_ptr);
 void clear_screen();
@@ -1137,10 +1135,10 @@ void wait_for_vsync(volatile int *pixel_ctrl_ptr);
 /* Global variables */
 volatile int pixel_buffer_start;
 int byte1, byte2, byte3;
-int p1_curX = MIN_X;
-int p1_curY = MIN_Y;
-int p2_curX = MAX_X;
-int p2_curY = MAX_Y;
+int p1_curX;
+int p1_curY;
+int p2_curX;
+int p2_curY;
 int p1_dx;
 int p1_dy;
 int p2_dx;
@@ -1171,13 +1169,13 @@ int main(void)
     wait_for_vsync(pixel_ctrl_ptr);
     pixel_buffer_start = *pixel_ctrl_ptr;
     clear_screen();
-    draw_start();
+    draw_fullscreen(starting_screen);
     draw_text(63, 25, "                    ");
     draw_text(63, 30, "                    ");
     draw_text(63, 35, "                    ");
     *(pixel_ctrl_ptr + 1) = 0xC0000000;
     pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-    draw_start();
+    draw_fullscreen(starting_screen);
     draw_text(63, 25, "                    ");
     draw_text(63, 30, "                    ");
     draw_text(63, 35, "                    ");
@@ -1195,6 +1193,12 @@ int main(void)
         }
     }
 
+    // set initial player positions
+    p1_curX = MIN_X;
+    p1_curY = MIN_Y;
+    p2_curX = MAX_X;
+    p2_curY = MAX_Y;
+
     // random number generator set-up
     srand(time(NULL));
 
@@ -1209,12 +1213,12 @@ int main(void)
     }
 
     // draw initial in-game visuals
-    draw_game_board();
+    draw_fullscreen(game_board_background);
     draw_tile(MIN_X, MIN_Y, blue_player);
     draw_tile(MAX_X, MAX_Y, red_player);
     wait_for_vsync(pixel_ctrl_ptr);
     pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-    draw_game_board();
+    draw_fullscreen(game_board_background);
     draw_tile(MIN_X, MIN_Y, blue_player);
     draw_tile(MAX_X, MAX_Y, red_player);
 
@@ -1263,7 +1267,7 @@ int main(void)
         // check player movements and update gameboard state
         make_move();
 
-        // generate splash bombs in the game
+        // if less than two splash bombs are on the board, generate new splash bombs at random locations
         if (splash_count < 2 && (p1_score >= 100 || p2_score >= 100))
         {
             int x_loc = rand() % 22;
@@ -1301,7 +1305,7 @@ int main(void)
         draw_text(63, 25, "                    ");
         draw_text(63, 30, "                    ");
         draw_text(63, 35, "                    ");
-        draw_text(65, 25, "Scores");
+        draw_text(66, 25, "Scores");
         draw_text(65, 30, "Blue: ");
         itoa(p1_score, p1_score_string, 10);
         draw_text(71, 30, p1_score_string);
@@ -1332,11 +1336,11 @@ int main(void)
     draw_text(63, 35, "                    ");
     if (winner == 1)
     {
-        draw_end_blue();
+        draw_fullscreen(blue_victory);
     }
     else if (winner == 2)
     {
-        draw_end_red();
+        draw_fullscreen(red_victory);
     }
 
     wait_for_vsync(pixel_ctrl_ptr);
@@ -1347,11 +1351,11 @@ int main(void)
     draw_text(63, 35, "                    ");
     if (winner == 1)
     {
-        draw_end_blue();
+        draw_fullscreen(blue_victory);
     }
     else if (winner == 2)
     {
-        draw_end_red();
+        draw_fullscreen(red_victory);
     }
 }
 
@@ -1373,8 +1377,8 @@ void get_PS2_input()
 }
 
 /* Game logic function */
-// directional logic for the players and update the
-// gameboard and scores after new movements
+// directional logic for the players and responsible for
+// updating the gameboard and scores after new movements
 void make_move()
 {
     get_PS2_input();
@@ -1428,7 +1432,7 @@ void make_move()
         p2_dx = 0;
     }
 
-    // checking bounds for player 1
+    // checking gameboard boundaries for player 1, stop player movement when hit
     if (struct_x1 == 0 && p1_dx == -10)
     {
         p1_dx = 0;
@@ -1446,7 +1450,7 @@ void make_move()
         p1_dy = 0;
     }
 
-    // checking bounds for player 2
+    // checking gameboard boundaries for player 2, stop player movement when hit
     if (struct_x2 == 0 && p2_dx == -10)
     {
         p2_dx = 0;
@@ -1464,12 +1468,12 @@ void make_move()
         p2_dy = 0;
     }
 
-    // create new residue that the players leave behind
+    // create new residues that the players leave behind
     game_board[struct_y1][struct_x1].colour = 1;
     game_board[struct_y2][struct_x2].colour = 2;
 
     // logic for splash bombs, passing through one creates a
-    // 9 by 9 residue splash of the respective player's colour
+    // circular residue splash of the respective player's colour
     if (game_board[struct_y1][struct_x1].colour == 1 && game_board[struct_y1][struct_x1].splash)
     {
         int i, j;
@@ -1480,7 +1484,12 @@ void make_move()
                 // check to prevent drawing residues outside of the gameboard
                 if ((struct_y1 + i) >= 0 && (struct_y1 + i) <= 21 && (struct_x1 + j) >= 0 && (struct_x1 + j) <= 21)
                 {
-                    game_board[struct_y1 + i][struct_x1 + j].colour = 1;
+                    // normalize the blast radius of the splash bombs to a circular shape
+                    double radius = sqrt(i * i + j * j);
+                    if (radius <= 4.5)
+                    {
+                        game_board[struct_y1 + i][struct_x1 + j].colour = 1;
+                    }
                 }
             }
         }
@@ -1497,7 +1506,12 @@ void make_move()
                 // check to prevent drawing residues outside of the gameboard
                 if ((struct_y2 + i) >= 0 && (struct_y2 + i) <= 21 && (struct_x2 + j) >= 0 && (struct_x2 + j) <= 21)
                 {
-                    game_board[struct_y2 + i][struct_x2 + j].colour = 2;
+                    // normalize the blast radius of the splash bombs to a circular shape
+                    double radius = sqrt(i * i + j * j);
+                    if (radius <= 4.5)
+                    {
+                        game_board[struct_y2 + i][struct_x2 + j].colour = 2;
+                    }
                 }
             }
         }
@@ -1505,7 +1519,7 @@ void make_move()
         splash_count--;
     }
 
-    // update player current locations
+    // update players' current locations
     p1_curX += p1_dx;
     p1_curY += p1_dy;
     p2_curX += p2_dx;
@@ -1532,9 +1546,9 @@ void make_move()
     }
 }
 
-/*  Drawing functions */
-// draw starting menu
-void draw_start()
+/*  Display & draw functions */
+// draw any background of 320 by 240 pixels
+void draw_fullscreen(const int image[240][320])
 {
     int x;
     int y;
@@ -1542,54 +1556,12 @@ void draw_start()
     {
         for (y = 0; y < RESOLUTION_Y; y++)
         {
-            plot_pixel(x, y, starting_screen[y][x]);
+            plot_pixel(x, y, image[y][x]);
         }
     }
 }
 
-// draw in-game board/area of play
-void draw_game_board()
-{
-    int x;
-    int y;
-    for (x = 0; x < RESOLUTION_X; x++)
-    {
-        for (y = 0; y < RESOLUTION_Y; y++)
-        {
-            plot_pixel(x, y, game_board_background[y][x]);
-        }
-    }
-}
-
-// draw end game screen for blue's victory
-void draw_end_blue()
-{
-    int x;
-    int y;
-    for (x = 0; x < RESOLUTION_X; x++)
-    {
-        for (y = 0; y < RESOLUTION_Y; y++)
-        {
-            plot_pixel(x, y, blue_victory[y][x]);
-        }
-    }
-}
-
-// draw end game screen for red's victory
-void draw_end_red()
-{
-    int x;
-    int y;
-    for (x = 0; x < RESOLUTION_X; x++)
-    {
-        for (y = 0; y < RESOLUTION_Y; y++)
-        {
-            plot_pixel(x, y, red_victory[y][x]);
-        }
-    }
-}
-
-// draw any 10 by 10 image
+// draw any image of 10 by 10 pixels
 void draw_tile(int x, int y, const int image[10][10])
 {
     int i, j;
