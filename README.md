@@ -1,4 +1,4 @@
-Instructions:
+## Instructions:
 1.	Compile and run the C program with CPUlator: https://cpulator.01xz.net/?sys=arm-de1soc, or the Intel FPGA Monitor Program on a physical DE1-SoC board. 
 
 2.	Start the game by pressing enter at the home screen.
